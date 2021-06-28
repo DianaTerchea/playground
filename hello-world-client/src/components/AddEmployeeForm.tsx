@@ -3,7 +3,6 @@ import {Button, Input} from "antd";
 import styled from "styled-components";
 import {useMutation} from "@apollo/client";
 import {CREATE_EMPLOYEE} from "../graphql/Mutations";
-import {GET_TEAM_MEMBERS} from "../graphql/Queries";
 const FormWrapper = styled.div`
   width: 300px;
   > * {
@@ -17,11 +16,11 @@ function AddEmployeeForm({teamId, setAddFormInvisible}) {
 
     const [createEmployee] = useMutation(CREATE_EMPLOYEE, {
         update(proxy, {data}) {
-            const getExistingTeamEmployees: any = proxy.readQuery({query: GET_TEAM_MEMBERS, variables: {id: teamId}})
-            const existingTeamEmployees = getExistingTeamEmployees ? getExistingTeamEmployees.getTeamMembers : []
-            const newEmployee = data.addEmployee
-            proxy.writeQuery({query: GET_TEAM_MEMBERS,variables: {id: teamId}, data: {getTeamMembers: [...existingTeamEmployees, newEmployee]}})
-            setAddFormInvisible(false);
+            // const getExistingTeamEmployees: any = proxy.readQuery({query: GET_TEAM_MEMBERS, variables: {id: teamId}})
+            // const existingTeamEmployees = getExistingTeamEmployees ? getExistingTeamEmployees.getTeamMembers : []
+            // const newEmployee = data.addEmployee
+            // proxy.writeQuery({query: GET_TEAM_MEMBERS,variables: {id: teamId}, data: {getTeamMembers: [...existingTeamEmployees, newEmployee]}})
+            setAddFormInvisible(false)
         },
         variables: {
             name: name,

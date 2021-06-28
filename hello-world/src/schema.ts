@@ -219,6 +219,8 @@ const Mutation = objectType({
                 const employee = await context.prisma.employee.delete({
                     where: {id: args.id},
                 })
+                const employeeList = await context.prisma.team.findMany({where: {id: employee.teamId}}).members()
+                emitter.publish("DELETE_EMPLOYEE", employeeList)
             },
         })
     }
