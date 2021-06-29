@@ -5,13 +5,13 @@ import {Button, Space, Table} from "antd";
 import AddEmployeeForm from "./AddEmployeeForm";
 import {REMOVE_EMPLOYEE} from "../graphql/Mutations";
 import { ON_ADD_EMPLOYEE, ON_DELETE_EMPLOYEE } from "../graphql/Subscriptions";
+import { useEffect } from "react";
 
 // @ts-ignore
 function EmployeesTable({teamId}) {
     const [isAddFormVisible, setIsAddFormVisible] = useState(false);
-    const {data} = useQuery(GET_TEAM_MEMBERS, {
-        variables: {id: parseInt(teamId)},
-        fetchPolicy: "network-first" as any
+    const {data, subscribeToMore} = useQuery(GET_TEAM_MEMBERS, {
+        variables: {id: parseInt(teamId)}
     },)
     const [deleteEmployee] = useMutation(REMOVE_EMPLOYEE, {
             /*CACHE VERSION */
@@ -26,8 +26,42 @@ function EmployeesTable({teamId}) {
             // }
         }
     )
-    useSubscription(ON_ADD_EMPLOYEE)
-    useSubscription(ON_DELETE_EMPLOYEE)
+    // subscriptions
+    useEffect(() => {
+        subscribeToMore({
+            document: ON_ADD_EMPLOYEE,
+            variables: {
+                teamId: parseInt(teamId)
+            },
+            updateQuery: (prev, {subscriptionData}) => {
+                if(subscriptionData.data.newEmployee === null) return prev;
+                return {
+                    ...prev,
+                    getTeamMembers: subscriptionData.data.newEmployee 
+                    ? [...prev.getTeamMembers, subscriptionData.data.newEmployee] 
+                    : prev.getTeamMembers
+                }
+            }
+        })
+    }, [])
+   
+    useEffect(() => {
+        subscribeToMore({
+            document: ON_DELETE_EMPLOYEE,
+            variables: {
+                teamId: parseInt(teamId)
+            },
+            updateQuery: (prev, {subscriptionData}) => {
+                if(subscriptionData.data.deleteEmployee === null) return prev;
+                return {
+                    ...prev,
+                    getTeamMembers: subscriptionData.data.deleteEmployee 
+                    ? prev.getTeamMembers.filter((emp: any) => emp.id != subscriptionData.data.deleteEmployee.id)
+                    : prev.getTeamMembers
+                }
+            }
+        })
+    }, [])
     const columns = [
         {
             title: "Name",

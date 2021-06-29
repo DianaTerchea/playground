@@ -1,8 +1,8 @@
 import {gql} from "@apollo/client";
 
 export const ON_ADD_EMPLOYEE = gql`
-subscription newEmployee{
-    newEmployee{
+subscription newEmployee($teamId: Int!){
+    newEmployee(teamId: $teamId){
       id
       name
       age
@@ -12,8 +12,8 @@ subscription newEmployee{
 `; 
 
 export const ON_DELETE_EMPLOYEE = gql`
-subscription deleteEmployee{
-    deleteEmployee{
+subscription deleteEmployee($teamId: Int!){
+    deleteEmployee(teamId: $teamId){
       id
       name
       age

@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import {ApolloClient, InMemoryCache, ApolloProvider, HttpLink, ApolloLink, from} from "@apollo/client";
-import {WebSocketLink} from 'apollo-link-ws';
+import {WebSocketLink} from '@apollo/client/link/ws';
 import Register from "./pages/Register";
 import AuthLayout from "./components/common/AuthLayout";
 import Login from "./pages/Login";
@@ -34,7 +34,7 @@ const authMiddleware = new ApolloLink((operation, forward) => {
 
     return forward(operation);
 })
-const link = split(
+const splitLink = split(
     ({query}) => {
         const definition = getMainDefinition(query)
         return (
@@ -50,7 +50,7 @@ const client = new ApolloClient({
     uri: "http://localhost:4000",
     link: from([
         authMiddleware,
-        link as any
+        splitLink as any
     ])
 })
 

@@ -162,8 +162,7 @@ const Mutation = objectType({
                         }
                     }
                 })
-                const employees = await context.prisma.team.findUnique({where: {id: args.data.teamId}}).members()
-                emitter.publish("NEW_EMPLOYEE", employees)
+                emitter.publish("NEW_EMPLOYEE", employee)
                 return employee
             }
         })
@@ -219,8 +218,7 @@ const Mutation = objectType({
                 const employee = await context.prisma.employee.delete({
                     where: {id: args.id},
                 })
-                const employeeList = await context.prisma.team.findMany({where: {id: employee.teamId}}).members()
-                emitter.publish("DELETE_EMPLOYEE", employeeList)
+                emitter.publish("DELETE_EMPLOYEE", employee)
             },
         })
     }
@@ -314,20 +312,32 @@ const AuthPayload = objectType({
 const Subscription = subscriptionType({
     definition(t) {
         t.field("newEmployee", {
-            type: list('Employee'),
-            resolve(data){
-                return data
+            type: 'Employee',
+            args: {
+                teamId: nonNull(intArg())
+            },
+            resolve(data, args){
+                if(data.teamId == args.teamId){
+                    return data
+                }
+                return null
             },
             subscribe: () => {
                 return emitter.asyncIterator("NEW_EMPLOYEE")
             }
         })
         t.field("deleteEmployee", {
-            type: list('Employee'),
-            resolve(data){
-                return data
+            type: 'Employee',
+            args: {
+                teamId: nonNull(intArg())
             },
-            subscribe: () => {
+            resolve(data, args){
+                if(data.teamId == args.teamId){
+                    return data
+                }
+                return null
+            },
+            subscribe: (...args) => {
                 return emitter.asyncIterator("DELETE_EMPLOYEE")
             }
         })

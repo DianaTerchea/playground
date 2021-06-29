@@ -66,8 +66,8 @@ enum Roles {
 }
 
 type Subscription {
-  deleteEmployee: [Employee]
-  newEmployee: [Employee]
+  deleteEmployee(teamId: Int!): Employee
+  newEmployee(teamId: Int!): Employee
 }
 
 type Team {
